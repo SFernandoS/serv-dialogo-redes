@@ -1,0 +1,58 @@
+/* Home.css */
+body {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #1e272e;
+    /* Cor de fundo azul escuro */
+    color: black;
+    /* Cor do texto */
+}
+
+.chat-container {
+    background-color: #ecf0f1;
+    /* Cor de fundo cinza */
+    padding: 20px;
+    border-radius: 50px;
+    width: 70rem;
+    height: inherit;
+    text-align: center;
+}
+
+.chat-list {
+    list-style-type: none;
+    background-color: #badefa;
+    padding: 0;
+    margin: 0;
+    border-radius: 25px;
+    overflow-y: scroll;
+    height: 40rem;
+}
+
+.img {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    object-fit: cover;
+    padding: 10px;
+    width: 4rem;
+    height: 4rem;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 30px;
+    width: 90%;
+    height: 4rem;
+    border: 2px solid #495863;
+    border-radius: 25px;
+}
+
+.chat-item:hover {
+    background-color: #badefa;
+    cursor: pointer;
+}

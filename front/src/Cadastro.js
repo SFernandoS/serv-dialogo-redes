@@ -17,9 +17,9 @@ const Cadastro = () => {
                 },
                 body: JSON.stringify({
                     email: email,
-                    dialog_capability: "both",
                     status: "online",
-                    password: senha
+                    password: senha,
+                    dialog_capabiliy: "both"
                 }),
             });
 
@@ -47,7 +47,7 @@ const Cadastro = () => {
                     Email:
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </label>
-                <label>
+                <label> 
                     Senha:
                     <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
                 </label>
