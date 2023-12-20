@@ -12,5 +12,14 @@ services:
     ports:
       - "5432:5432"
 
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://admin:admin@db/serv_dialogo
+
 volumes:
   postgres_data:
