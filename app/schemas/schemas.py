@@ -37,7 +37,7 @@ class User(UserBase):
 
 
 class UserUpdate(BaseModel):
-    nickname: Optional[constr(min_length=3, max_length=50)] = None
+    email: Optional[constr(min_length=3, max_length=50)] = None
     password: Optional[str] = None
     dialog_capability: Optional[str] = None
     status: Optional[str] = None

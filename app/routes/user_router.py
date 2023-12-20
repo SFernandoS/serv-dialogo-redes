@@ -5,12 +5,15 @@ from app.routes.crud_user import create_user, get_users, get_user
 from app.schemas.schemas import User, UserCreate, UserUpdate
 from app.models.models import Base
 from app.database import engine, SessionLocal
+from fastapi.security import OAuth2PasswordBearer
 
 
 Base.metadata.create_all(bind=engine)
 
 
 router = APIRouter()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 def get_db():
@@ -27,7 +30,7 @@ def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/users/", response_model=List[User])
-def read_users(db: Session = Depends(get_db)):
+def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     users = get_users(db)
     return users
 
