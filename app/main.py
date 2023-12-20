@@ -1,5 +1,5 @@
 from datetime import timedelta
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from werkzeug.security import check_password_hash
 from sqlalchemy.orm import Session
@@ -10,6 +10,8 @@ from app.database import engine, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.models import User
 from app.auth import create_access_token, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_from_token
+from typing import Dict
+import json
 
 Base.metadata.create_all(bind=engine)
 
@@ -81,3 +83,38 @@ async def read_users_me(token: str = Depends(oauth2_scheme)):
     current_user = get_current_user_from_token(token, db)
     db.close()
     return current_user
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: Dict[str, WebSocket] = {}
+
+    async def connect(self, websocket: WebSocket, user_id: str):
+        await websocket.accept()
+        self.active_connections[user_id] = websocket
+
+    def disconnect(self, user_id: str):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
+
+    async def send_private_message(self, message: str, receiver_id: str):
+        receiver = self.active_connections.get(receiver_id)
+        if receiver:
+            await receiver.send_text(message)
+
+
+manager = ConnectionManager()
+
+
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            json_data = await websocket.receive_text()
+            data = json.loads(json_data)
+            receiver_id = data["receiver_id"]
+            message = data["message"]
+            await manager.send_private_message(f"Message from {user_id}: {message}", receiver_id)
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)

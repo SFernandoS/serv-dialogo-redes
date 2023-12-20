@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat WebSocket</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        #chat-container { padding: 10px; }
+        #messageInput, #receiverId { width: 300px; padding: 10px; margin: 5px; }
+        #sendButton { padding: 10px; }
+        #messages { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <input type="text" id="receiverId" placeholder="ID do Destinatário">
+        <input type="text" id="messageInput" placeholder="Digite uma mensagem">
+        <button id="sendButton" onclick="sendMessage()">Enviar</button>
+        <ul id="messages"></ul>
+    </div>
+
+    <script>
+        var ws;
+        var userId = prompt("Digite seu ID de usuário");
+
+        if(userId) {
+            ws = new WebSocket(`ws://localhost:8000/ws/${userId}`);
+
+            ws.onmessage = function(event) {
+                appendMessage("Recebido: " + event.data);
+            };
+        }
+
+        function sendMessage() {
+            var receiverId = document.getElementById("receiverId").value;
+            var messageText = document.getElementById("messageInput").value;
+            var message = { receiver_id: receiverId, message: messageText };
+            ws.send(JSON.stringify(message));
+            appendMessage("Enviado para " + receiverId + ": " + messageText);
+            document.getElementById("messageInput").value = '';
+        }
+
+        function appendMessage(text) {
+            var messages = document.getElementById('messages');
+            var message = document.createElement('li');
+            message.textContent = text;
+            messages.appendChild(message);
+        }
+    </script>
+</body>
+</html>
