@@ -10,8 +10,6 @@ def create_user(db: Session, user: UserCreate):
     db_user = User(
         email=user.email,
         password_hash=hashed_password,
-        dialog_capability=user.dialog_capability,
-        status=user.status
     )
     db.add(db_user)
     db.commit()
@@ -24,25 +22,4 @@ def get_users(db: Session):
 
 
 def get_user(db: Session, user_id: int):
-    return db.query(User).options(joinedload(User.interested_topics)).filter(User.id == user_id).first()
-
-
-def update_user(db: Session, user_id: int, user: UserUpdate):
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if db_user is None:
-        return None
-    for var, value in vars(user).items():
-        if value:
-            setattr(db_user, var, value)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-def delete_user(db: Session, user_id: int):
-    db_user = db.query(User).filter(User.id == user_id).first()
-    if db_user:
-        db.delete(db_user)
-        db.commit()
-        return db_user
+    return db.query(User).filter(User.id == user_id).first()

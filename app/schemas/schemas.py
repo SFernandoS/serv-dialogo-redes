@@ -20,8 +20,6 @@ class Topic(TopicBase):
 
 class UserBase(BaseModel):
     email: str
-    dialog_capability: str
-    status: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -30,7 +28,6 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    interested_topics: List[Topic] = []
 
     class Config:
         orm_mode = True
@@ -39,8 +36,6 @@ class User(UserBase):
 class UserUpdate(BaseModel):
     email: Optional[constr(min_length=3, max_length=50)] = None
     password: Optional[str] = None
-    dialog_capability: Optional[str] = None
-    status: Optional[str] = None
 
 
 class Token(BaseModel):

@@ -1,5 +1,6 @@
 from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
+from app.websocket import ConnectionManager
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from werkzeug.security import check_password_hash
 from sqlalchemy.orm import Session
@@ -10,7 +11,6 @@ from app.database import engine, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.models import User
 from app.auth import create_access_token, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_from_token
-from typing import Dict
 import json
 
 Base.metadata.create_all(bind=engine)
@@ -77,44 +77,28 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/me")
-async def read_users_me(token: str = Depends(oauth2_scheme)):
-    db = SessionLocal()
-    current_user = get_current_user_from_token(token, db)
-    db.close()
-    return current_user
-
-
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, WebSocket] = {}
-
-    async def connect(self, websocket: WebSocket, user_id: str):
-        await websocket.accept()
-        self.active_connections[user_id] = websocket
-
-    def disconnect(self, user_id: str):
-        if user_id in self.active_connections:
-            del self.active_connections[user_id]
-
-    async def send_private_message(self, message: str, receiver_id: str):
-        receiver = self.active_connections.get(receiver_id)
-        if receiver:
-            await receiver.send_text(message)
-
-
 manager = ConnectionManager()
 
 
-@app.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
+@app.websocket("/ws/user/{user_id}")
+async def websocket_user_chat(websocket: WebSocket, user_id: str, token: str = Depends(oauth2_scheme)):
     await manager.connect(websocket, user_id)
     try:
         while True:
-            json_data = await websocket.receive_text()
-            data = json.loads(json_data)
-            receiver_id = data["receiver_id"]
-            message = data["message"]
-            await manager.send_private_message(f"Message from {user_id}: {message}", receiver_id)
+            data = await websocket.receive_text()
+            message_data = json.loads(data)
+            await manager.send_private_message(message_data["message"], message_data["receiver"])
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)
+
+
+@app.websocket("/ws/topic/{user_id}/{topic_id}")
+async def websocket_topic_chat(websocket: WebSocket, user_id: str, topic_id: int, token: str = Depends(oauth2_scheme)):
+    await manager.connect(websocket, user_id)
+    await manager.join_topic(user_id, topic_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.send_topic_message(f"{user_id} says: {data}", topic_id)
     except WebSocketDisconnect:
         manager.disconnect(user_id)
