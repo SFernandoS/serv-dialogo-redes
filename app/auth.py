@@ -7,8 +7,8 @@ class JWTManager:
     @staticmethod
     def encode_token(data):
         payload = {
-            'exp': datetime.utcnow() + timedelta(minutes=30),  # Expiração do token em 1 dia
-            'iat': datetime.utcnow(),  # Data de emissão do token
+            'exp': datetime.utcnow() + timedelta(minutes=30),
+            'iat': datetime.utcnow(),
             **data
         }
         return jwt.encode(payload, JWTManager.secret_key, algorithm='HS256')
