@@ -1,23 +1,39 @@
 // Cadastro.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importa o hook useNavigate
+import { useNavigate } from 'react-router-dom';
 import './Cadastro.css';
 
 const Cadastro = () => {
-    const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const navigate = useNavigate(); // Obtém a função de navegação
+    const navigate = useNavigate();
 
-    const handleCadastro = () => {
-        // Aqui você pode adicionar lógica para lidar com os dados do formulário
-        console.log('Nome:', nome);
-        console.log('Email:', email);
-        console.log('Senha:', senha);
+    const handleCadastro = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: senha,
+                }),
+            });
+
+            if (response.ok) {
+                console.log('Registration successful');
+                navigate('/login');
+            } else {
+                const data = await response.json();
+                console.error('Registration failed:', data.error);
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
     };
 
     const redirectToLogin = () => {
-        // Redireciona para a tela de login
         navigate('/login');
     };
 
@@ -25,10 +41,6 @@ const Cadastro = () => {
         <div className="container">
             <h2>Tela de Cadastro</h2>
             <form>
-                <label>
-                    Nome:
-                    <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
-                </label>
                 <label>
                     Email:
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
