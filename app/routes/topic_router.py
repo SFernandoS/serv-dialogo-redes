@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from routes.crud_topics import create_topic, get_topic, get_topics
-from schemas.schemas import Topic, TopicCreate
-from database import engine, SessionLocal
-from models.models import Base
+from app.routes.crud_topics import create_topic, get_topic, get_topics
+from app.schemas.schemas import Topic, TopicCreate
+from app.database import engine, SessionLocal
+from app.models.models import Base
 
 
 Base.metadata.create_all(bind=engine)

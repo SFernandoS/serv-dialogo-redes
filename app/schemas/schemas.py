@@ -19,7 +19,7 @@ class Topic(TopicBase):
 
 
 class UserBase(BaseModel):
-    nickname: constr(min_length=3, max_length=50)
+    email: str
     dialog_capability: str
     status: Optional[str] = None
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from routes.crud_user import create_user, get_users, get_user
-from schemas.schemas import User, UserCreate, UserUpdate
-from models.models import Base
-from database import engine, SessionLocal
+from app.routes.crud_user import create_user, get_users, get_user
+from app.schemas.schemas import User, UserCreate, UserUpdate
+from app.models.models import Base
+from app.database import engine, SessionLocal
 
 
 Base.metadata.create_all(bind=engine)
@@ -21,7 +21,7 @@ def get_db():
         db.close()
 
 
-@router.post("/users/", response_model=User, status_code=status.HTTP_201_CREATED)
+@router.post("/register/", response_model=User, status_code=status.HTTP_201_CREATED)
 def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
     return create_user(db, user)
 

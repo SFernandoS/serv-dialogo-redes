@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
-from models.models import User
-from schemas.schemas import UserCreate, UserUpdate
+from app.models.models import User
+from app.schemas.schemas import UserCreate, UserUpdate
 from werkzeug.security import generate_password_hash
 
 
 def create_user(db: Session, user: UserCreate):
     hashed_password = generate_password_hash(user.password)
     db_user = User(
-        nickname=user.nickname,
+        email=user.email,
         password_hash=hashed_password,
         dialog_capability=user.dialog_capability,
         status=user.status

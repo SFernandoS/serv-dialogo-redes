@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.models import Topic
-from schemas.schemas import TopicCreate
+from app.models.models import Topic
+from app.schemas.schemas import TopicCreate
 
 
 def create_topic(db: Session, topic_data: TopicCreate):

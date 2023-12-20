@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base
 
 
 user_topic_table = Table('user_topic', Base.metadata,
@@ -13,7 +13,7 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
-    nickname = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     dialog_capability = Column(String, nullable=False)
     status = Column(String, nullable=False)
