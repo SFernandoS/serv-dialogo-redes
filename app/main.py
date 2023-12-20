@@ -5,11 +5,21 @@ from app.routes.user_router import router as user_router
 from app.routes.topic_router import router as topic_router
 from app.models.models import Base
 from app.database import engine, SessionLocal
+from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"], 
+    allow_headers=["*"],
+)
 
 
 def get_db():

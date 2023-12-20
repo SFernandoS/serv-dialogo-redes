@@ -17,9 +17,9 @@ const Cadastro = () => {
                 },
                 body: JSON.stringify({
                     email: email,
+                    dialog_capability: "both",
                     status: "online",
-                    password: senha,
-                    dialog_capabiliy: "both"
+                    password: senha
                 }),
             });
 
