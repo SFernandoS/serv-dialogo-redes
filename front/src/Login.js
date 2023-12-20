@@ -6,10 +6,30 @@ import './Login.css';
 const Login = () => {
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        // Lógica de login aqui
+    const handleLogin = async (username, password) => {
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('password', password);
+        const response = await fetch('http://localhost:8000/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData,
+        });
+    
+        if (response.ok) {
+            const data = await response.json();
+            const accessToken = data.access_token;
+            // Save the access token in a secure way (e.g., localStorage) for future requests.
+            localStorage.setItem('accessToken', accessToken);
+            // Redirect the user to the home page.
+            navigate('/home');
+        } else {
+            // Handle authentication error
+            console.error(response.body);
+        }
         
-        console.log('Realizando login...');
     };
 
     const redirectToCadastro = () => {

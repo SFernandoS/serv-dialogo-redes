@@ -17,15 +17,16 @@ const Cadastro = () => {
                 },
                 body: JSON.stringify({
                     email: email,
+                    dialog_capability: "both",
                     status: "online",
                     password: senha,
-                    dialog_capabiliy: "both"
+                    
                 }),
             });
 
             if (response.ok) {
                 console.log('Registration successful');
-                navigate('/login');
+                navigate('/home');
             } else {
                 const data = await response.json();
                 console.error('Registration failed:', data.error);
