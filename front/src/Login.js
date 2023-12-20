@@ -1,10 +1,13 @@
 // Login.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import './Login.css';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [username, setEmail] = useState('');
+    const [password, setSenha] = useState('');
 
     const handleLogin = async (username, password) => {
         const formData = new URLSearchParams();
@@ -41,13 +44,15 @@ const Login = () => {
         <div className="container">
             <h2 className="titulo">Tela de Login</h2>
             <form>
-                <label htmlFor="email">E-mail:</label>
-                <input type="email" id="email" name="email" />
-
-                <label htmlFor="password">Senha:</label>
-                <input type="password" id="password" name="password" />
-
-                <button type="button" onClick={handleLogin}>
+                <label>
+                    Email:
+                    <input type="email" value={username} onChange={(e) => setEmail(e.target.value)} />
+                </label>
+                <label> 
+                    Senha:
+                    <input type="password" value={password} onChange={(e) => setSenha(e.target.value)} />
+                </label>
+                <button type="button" onClick={handleLogin(username, password)}>
                     Login
                 </button>
             </form>
