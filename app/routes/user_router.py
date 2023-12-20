@@ -30,7 +30,7 @@ def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/users/", response_model=List[User])
-def read_users(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def read_users(db: Session = Depends(get_db)):
     users = get_users(db)
     return users
 
