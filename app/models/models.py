@@ -1,22 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, Enum
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
-from enum import Enum as PyEnum
-
-
-Base = declarative_base()
-
-
-class DialogCapability(PyEnum):
-    CHAT = "chat"
-    VIDEO_CALL = "video_call"
-    BOTH = "both"
-
-
-class UserStatus(PyEnum):
-    ONLINE = "online"
-    OFFLINE = "offline"
-    BUSY = "busy"
+from database import Base
 
 
 user_topic_table = Table('user_topic', Base.metadata,
@@ -31,8 +15,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     nickname = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
-    dialog_capability = Column(Enum(DialogCapability), nullable=False)
-    status = Column(Enum(UserStatus), default=UserStatus.OFFLINE)
+    dialog_capability = Column(String, nullable=False)
+    status = Column(String, nullable=False)
 
     interested_topics = relationship(
         "Topic",

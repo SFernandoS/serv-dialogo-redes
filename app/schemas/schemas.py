@@ -1,18 +1,5 @@
 from pydantic import BaseModel, constr
 from typing import List, Optional
-from enum import Enum
-
-
-class DialogCapability(str, Enum):
-    CHAT = "chat"
-    VIDEO_CALL = "video_call"
-    BOTH = "both"
-
-
-class UserStatus(str, Enum):
-    ONLINE = "online"
-    OFFLINE = "offline"
-    BUSY = "busy"
 
 
 class TopicBase(BaseModel):
@@ -33,8 +20,8 @@ class Topic(TopicBase):
 
 class UserBase(BaseModel):
     nickname: constr(min_length=3, max_length=50)
-    dialog_capability: DialogCapability
-    status: Optional[UserStatus] = None
+    dialog_capability: str
+    status: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -46,11 +33,20 @@ class User(UserBase):
     interested_topics: List[Topic] = []
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
 class UserUpdate(BaseModel):
     nickname: Optional[constr(min_length=3, max_length=50)] = None
     password: Optional[str] = None
-    dialog_capability: Optional[DialogCapability] = None
-    status: Optional[UserStatus] = None
+    dialog_capability: Optional[str] = None
+    status: Optional[str] = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
