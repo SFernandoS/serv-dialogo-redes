@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat em Tópicos</title>
+</head>
+<body>
+    <h2>Chat em Tópicos</h2>
+    <input type="text" id="messageInput" placeholder="Digite uma mensagem">
+    <button onclick="sendMessage()">Enviar Mensagem</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const userId = prompt("Digite seu ID de usuário");
+        const topicName = prompt("Digite o nome do tópico");
+        const ws = new WebSocket(`ws://localhost:8000/ws/topic/${userId}/${topicName}`);
+        ws.onmessage = (event) => {
+            const messages = document.getElementById('messages');
+            const message = document.createElement('li');
+            message.textContent = event.data;
+            messages.appendChild(message);
+        };
+
+        function sendMessage() {
+            const messageText = document.getElementById('messageInput').value;
+            ws.send(messageText);
+        }
+    </script>
+</body>
+</html>
