@@ -1,7 +1,7 @@
 # serv-dialogo-redes
 Trabalho Final de disciplina de Fundamentos de Redes de Computadores
 
-## Requirementos:
+## Requerimentos:
 - Python 3.10.*
 - Docker-compose
 - pip 23.3.1
