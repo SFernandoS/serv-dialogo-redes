@@ -12,25 +12,43 @@ const Chat = () => {
     const [peer, setPeer] = useState(null);
     const [localStream, setLocalStream] = useState(null);
     const [remoteStream, setRemoteStream] = useState(null);
+    const [showDialog, setShowDialog] = useState(false);
+    const initiator = useRef(false);
 
     const openDialog = () => {
         setShowDialog(true);
     };
-    
+
     const closeDialog = () => {
         setShowDialog(false);
     };
 
     useEffect(() => {
         websocket.current = new WebSocket(`ws://localhost:8000/ws/topic/${userId}/${topicId}`);
-        websocket.current.onmessage = event => {
+        websocket.current.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                setChatLog(prevLog => [...prevLog, `Recebido: ${data.message}`]);
+                if (data.video_offer) {
+                    peer.signal(data.video_offer);
+                } else if (data.ice_candidate) {
+                    peer.signal(data.ice_candidate);
+                } else {
+                    setChatLog((prevLog) => [...prevLog, `Recebido: ${data.message}`]);
+                }
             } catch (error) {
                 console.error("Erro ao analisar a mensagem do WebSocket:", error);
             }
         };
+
+        websocket.current.onopen = () => {
+            if (websocket.current.readyState === WebSocket.OPEN) {
+                if (initiator.current) {
+                    startVideoChat();
+                    sendChatMessage();
+                }
+            }
+        };
+
         return () => {
             if (websocket.current) websocket.current.close();
         };
@@ -51,10 +69,10 @@ const Chat = () => {
             setLocalStream(stream);
             localVideoRef.current.srcObject = stream;
 
-            const newPeer = new SimplePeer({ initiator: false, stream });
+            const newPeer = new SimplePeer({ initiator: true, stream });
 
             newPeer.on("signal", (data) => {
-                websocket.current.emit("video_answer", data);
+                websocket.current.send(JSON.stringify({ video_offer: data }));
             });
 
             newPeer.on("stream", (remoteStream) => {
@@ -62,7 +80,7 @@ const Chat = () => {
                 remoteVideoRef.current.srcObject = remoteStream;
             });
 
-            websocket.current.on("video_offer", (data) => {
+            websocket.current.on("video_answer", (data) => {
                 newPeer.signal(data);
             });
 
@@ -91,7 +109,6 @@ const Chat = () => {
 
     return (
         <div className="chat-container">
-            {/* Área de Vídeo */}
             <div className="video-chat">
                 <video ref={localVideoRef} autoPlay muted></video>
                 <video ref={remoteVideoRef} autoPlay></video>
@@ -99,18 +116,22 @@ const Chat = () => {
                 <button onClick={stopVideoChat}>Stop Video Chat</button>
             </div>
 
-            {/* Área de Chat de Texto */}
             <div className="text-chat">
                 <h2>Text Chat</h2>
                 <div className="chat-messages-box">
                     {chatLog.map((msg, index) => (
-                        <p key={index} className="chat-message">{msg}</p>
+                        <p key={index} className="chat-message">
+                            {msg}
+                        </p>
                     ))}
                 </div>
-                <form className="chat-form" onSubmit={e => {
-                    e.preventDefault();
-                    sendChatMessage();
-                }}>
+                <form
+                    className="chat-form"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        sendChatMessage();
+                    }}
+                >
                     <input
                         type="text"
                         placeholder="Type your message..."

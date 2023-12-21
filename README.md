@@ -6,13 +6,14 @@ Requirementos:
 - Docker-compose
 - pip 23.3.1
 
-Para Iniciar localmente:
-- Crie uma [Crie uma virtualenv](https://docs.python.org/3/library/venv.html´virtualenv)
-- Entre na virtualenv
-- Instale os requirements: ``pip install -r requirements.txt``
-- Inicie o serviço do postgres: ``docker-compose up -d``
+Para Iniciar o projeto:
 - Inicie a API: 
     - ``cd serv-dialogo-redes``
-    - ``uvicorn app.main:app --reload``
+    - ``docker-compose up -d``
+- Inicie o front-end:
+    - ``cd front-end``
+    - ``npm install``
+    - ``npm start``
+
 
 Swagger: /docs
