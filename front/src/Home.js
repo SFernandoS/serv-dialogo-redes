@@ -7,13 +7,13 @@ import { useState, useEffect } from 'react';
 
 const Home = () => {
     // get all chats from backend
-    const [users, setUsers] = useState([]);
+    const [topics, setTopics] = useState([]);
     const [userName, setUserName] = useState('');
     const navigate = useNavigate();
 
     const getChats = async () => {
         try {
-            const response = await fetch('http://localhost:8000/users/users/', {
+            const response = await fetch('http://localhost:8000/topics/topics/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -21,24 +21,24 @@ const Home = () => {
             });
 
             if (response.ok) {
-                console.log('Users retrieved successfully');
+                console.log('topics retrieved successfully');
                 const data = await response.json();
                 console.log(data);
-                setUsers(data);
+                setTopics(data);
             } else {
                 const data = await response.json();
-                console.error('Users retrieval failed:', data.error);
+                console.error('topics retrieval failed:', data.error);
             }
         } catch (error) {
-            console.error('Error during users retrieval:', error);
+            console.error('Error during topics retrieval:', error);
         }
     }
         useEffect(() => {
             getChats();
         }, []);
 
-        const redirectToChat = () => {
-            navigate('/chat');
+        const redirectToChat = (userId, topicId) => {
+            navigate(`/chat/${userId}/${topicId}`);
         }
 
      // create simple chats home screen with a list of chats and the selected chat opened
@@ -48,18 +48,18 @@ const Home = () => {
                 <h2 className="titulo">Chats</h2>
                 <div className="chat-list">
                     {/* list of chats */}
-                    {users.map(user => {
+                    {topics.map(topic => {
                         return (
-                            <div key={user.id} className={"chat-item"} onClick={redirectToChat}>
+                            <div key={topic.id} className={"chat-item"} onClick={() => {redirectToChat(userId, topicId)}}>
                                 <div className="chat-item-img">
                                     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" className='img' />
                                 </div>
                                 <div className="chat-item-info">
                                     <div className="chat-item-info-header">
-                                        <h4>{user.email}</h4>
+                                        <h4>{topic.name}</h4>
                                     </div>
                                     <div className="chat-item-info-body">
-                                        <p>Olá, tudo bem?</p>
+                                        <p>{topics.length}</p>
                                     </div>
                                 </div>
                             </div>
