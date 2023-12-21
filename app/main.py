@@ -1,3 +1,4 @@
+# Importa bibliotecas necessárias
 from datetime import timedelta
 from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
 from app.websocket import ConnectionManager
@@ -13,12 +14,13 @@ from app.models.models import User
 from app.auth import create_access_token, authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, get_current_user_from_token
 import json
 
+# Criação de tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
 
-
+# Inicializa a aplicação FastAPI
 app = FastAPI()
 
-
+# Adiciona middleware para lidar com CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,7 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Função para obter uma instância de conexão com o banco de dados
 def get_db():
     db = SessionLocal()
     try:
@@ -35,30 +37,30 @@ def get_db():
     finally:
         db.close()
 
-
+# Inclui as rotas definidas nos arquivos user_router e topic_router
 app.include_router(user_router, prefix="/users", tags=["users"])
 app.include_router(topic_router, prefix="/topics", tags=["topics"])
 
-
+# Rota de boas-vindas
 @app.get("/")
 def read_topics():
     return "Bem vindo a API do servdialogo"
 
-
+# Define o esquema de autenticação OAuth2
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
+# Função para obter o usuário atual a partir do token
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     user = db.query(User).filter(User.email == token).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
+            detail="Credenciais de autenticação inválidas",
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
 
-
+# Rota para obter o token de acesso
 @app.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     db = SessionLocal()
@@ -67,7 +69,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="E-mail ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -76,10 +78,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-
+# Instância do ConnectionManager para gerenciar conexões WebSocket
 manager = ConnectionManager()
 
-
+# Rota WebSocket para comunicação de usuário para usuário
 @app.websocket("/ws/user/{user_id}")
 async def websocket_user_chat(websocket: WebSocket, user_id: str, token: str = Depends(oauth2_scheme)):
     await manager.connect(websocket, user_id)
@@ -91,7 +93,7 @@ async def websocket_user_chat(websocket: WebSocket, user_id: str, token: str = D
     except WebSocketDisconnect:
         manager.disconnect(user_id)
 
-
+# Rota WebSocket para comunicação em tópico específico
 @app.websocket("/ws/topic/{user_id}/{topic_id}")
 async def websocket_topic_chat(websocket: WebSocket, user_id: str, topic_id: int, token: str = Depends(oauth2_scheme)):
     await manager.connect(websocket, user_id)
@@ -99,6 +101,6 @@ async def websocket_topic_chat(websocket: WebSocket, user_id: str, topic_id: int
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.send_topic_message(f"{user_id} says: {data}", topic_id)
+            await manager.send_topic_message(f"{user_id} diz: {data}", topic_id)
     except WebSocketDisconnect:
         manager.disconnect(user_id)
