@@ -1,6 +1,20 @@
 # serv-dialogo-redes
 Trabalho Final de disciplina de Fundamentos de Redes de Computadores
 
+## Grupo
+
+| Nome                                      | Matrícula          |
+|-------------------------------------------|--------------------|
+| Gabrielly Assunção Rodrigues              | 200018442          |
+| João Gabriel Antunes S. Medeiros e Silva  | 170013651          |
+| Fernando Vargas Teotonio de Oliveira      | 180016491          |
+| Luiz Henrique Fernandes Zamprogno         | 190033681          |
+| Miguel Matos Costa de Frias Barbosa       | 211039636          |
+
+## Apresentação
+
+- [Youtube](https://youtu.be/YlIItYePVXM?si=rshXOu8sx87b5mDY)
+
 ## Requerimentos:
 - Python 3.10.*
 - Docker-compose
